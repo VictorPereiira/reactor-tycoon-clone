@@ -23,11 +23,12 @@ reactor_tycoon = {
     shopping: {
         box: [
             {
-                'Name': 'Wind Turbine',
-                'UnitValue': 1,
-                'Production': 1,
-                'LifeTime': 5,
-                'ElementStatus': 'off'
+                'id': 0,
+                'name': 'Wind Turbine',
+                'unitValue': 1,
+                'production': 1,
+                'lifeTime': 5,
+                'elementStatus': 'off'
             }
         ],
 
@@ -35,10 +36,7 @@ reactor_tycoon = {
             let game = reactor_tycoon,
                 elementBuy = this.box[id],
                 cashAccess = game.controlPanel.cash,
-                value = elementBuy.UnitValue * quantity
-
-            console.log(`you have ${game.controlPanel.cash} in cash!!!`)
-
+                value = elementBuy.unitValue * quantity
 
             if (cashAccess >= value) {
                 console.log('buying...')
@@ -49,83 +47,77 @@ reactor_tycoon = {
                 localStorage.cash = cashAccess
 
                 this.putOnTheMap(elementBuy)
-            }
+            } else console.log('You not have cash! 😞')
         },
 
         putOnTheMap(elementBuy) {
+            console.log('putOnTheMap...');
+            console.log(' ');
+
             let currentMap = JSON.parse(localStorage.mapOn),
-                lifeTimeElement = elementBuy.LifeTime,
-                nameElement = elementBuy.Name
+                building_site = currentMap.building_site
 
-            currentMap.building_site.push(elementBuy)
-
-            document.querySelector('.map').innerHTML += `
-                    <div onclick="reactor_tycoon.element.toOnElement(${currentMap.building_site}, 0)" class="elementContainer">
-                        <div>${nameElement}</div>
-                    </div>
-                `
-
-            reactor_tycoon.element.toOnElement(currentMap.building_site, 0)
-            console.log(currentMap.building_site)
+            building_site.push(elementBuy)
+            localStorage.mapOn = JSON.stringify(currentMap)
+            reactor_tycoon.draw()
         }
     },
 
+    cpt: [],
+
     element: {
-        toOnElement(building_site, id) {
-            console.log(`this is a building_site: ${building_site}`);
-            let element = building_site[id],
-                lifeTimeElement = element.LifeTime
+        toOnElement(id) {
+            let currentMap = JSON.parse(localStorage.mapOn),
+                buildingSite = currentMap.building_site,
+                element = buildingSite[id],
+                lifeTimeElement = element.lifeTime
 
-            if (element.ElementStatus === "on") return console.log('funfou!!!');
-            // if (buildingSiteMap < 1) return
+            if (element.elementStatus === "on") return console.log('This element work 🛠')
+            element.elementStatus = 'on'
+            localStorage.mapOn = JSON.stringify(currentMap)
+            reactor_tycoon.cpt.push(id)
 
+            console.log('tuOn: ' + id + ' element');
 
+            let cptElement = setInterval(() => {
+                console.log('continue');
+                if (reactor_tycoon.cpt === true) return
+                let energyValue = localStorage.energyValue,
+                    energyCapacity = localStorage.energyCapacity
 
-            const cpt = setInterval(() => {
-                let game = reactor_tycoon,
-                    energyValue = game.controlPanel.energyValue,
-                    energyCapacity = game.controlPanel.energyCapacity
-
-                if (energyValue === energyCapacity) return
+                if (energyValue === energyCapacity) return console.log('You reached the maximum energyCapacity ⚠');
 
                 energyValue++
                 lifeTimeElement--
                 localStorage.energyValue = energyValue
-                localStorage.energyCapacity = energyCapacity
-                reactor_tycoon.initGame()
-
-                console.log(`Energy_Value: ${energyValue}`)
-                console.log(`Life_Time_Component: ${lifeTimeElement}`)
-                console.log(' ')
+                document.querySelector('.energy').textContent = energyValue
 
                 if (lifeTimeElement < 1) {
-                    clearInterval(cpt)
-                    element.ElementStatus = 'on'
-                    console.log(element);
+                    clearInterval(cptElement)
+                    element.elementStatus = 'off'
+                    localStorage.mapOn = JSON.stringify(currentMap)
 
                     // autoOnElement
                     // this.component[0].LifeTime = 5
                     // reactor_tycoon.toOnComponent()
                 }
             }, 1000)
-        }
+        },
     },
 
     actions: {
         converterEnergyToCash() {
-            if (localStorage.energyValue == 0) return
-            let game = reactor_tycoon
-            game.initGame()
+            let energyValue = Number(localStorage.energyValue),
+                cash = Number(localStorage.cash)
 
-            let energyValue = game.controlPanel.energyValue,
-                cash = game.controlPanel.cash
-
-            if (game.controlPanel.energyValue < 1) return
+            if (energyValue < 1) return console.log('You not have energy! ⚡')
             cash += energyValue
-            localStorage.cash = cash
-            localStorage.energyValue = 0
+            energyValue = 0
 
-            game.initGame()
+            localStorage.cash = cash
+            localStorage.energyValue = energyValue
+            document.querySelector('.cash').textContent = cash
+            document.querySelector('.energy').textContent = energyValue
         }
 
         // Admin Functions 
@@ -168,6 +160,22 @@ reactor_tycoon = {
         }
 
         console.log(' ');
+    },
+
+    draw() {
+        let currentMap = JSON.parse(localStorage.mapOn),
+            buildingSite = currentMap.building_site
+
+        for (let i in buildingSite) {
+            let idElement = buildingSite[i].id + i,
+                nameElement = buildingSite[i].name
+
+            document.querySelector('.map').innerHTML += `
+            <div class="elementContainer" onclick='reactor_tycoon.element.toOnElement(${idElement})'>
+                <div>${nameElement}</div>
+            </div>
+            `
+        }
     }
 }
 
