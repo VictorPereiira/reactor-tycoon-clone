@@ -26,7 +26,8 @@ reactor_tycoon = {
                 'Name': 'Wind Turbine',
                 'UnitValue': 1,
                 'Production': 1,
-                'LifeTime': 5
+                'LifeTime': 5,
+                'ElementStatus': 'off'
             }
         ],
 
@@ -45,8 +46,7 @@ reactor_tycoon = {
 
                 cashAccess -= value
                 game.controlPanel.cash -= value
-                localStorage.setItem('cash', cashAccess)
-
+                localStorage.cash = cashAccess
 
                 this.putOnTheMap(elementBuy)
             }
@@ -54,26 +54,45 @@ reactor_tycoon = {
 
         putOnTheMap(elementBuy) {
             let currentMap = JSON.parse(localStorage.mapOn),
-                lifeTimeElement = elementBuy.LifeTime
+                lifeTimeElement = elementBuy.LifeTime,
+                nameElement = elementBuy.Name
 
             currentMap.building_site.push(elementBuy)
-            reactor_tycoon.element.toOnElement(lifeTimeElement, currentMap.building_site)
+
+            document.querySelector('.map').innerHTML += `
+                    <div onclick="reactor_tycoon.element.toOnElement(${currentMap.building_site}, 0)" class="elementContainer">
+                        <div>${nameElement}</div>
+                    </div>
+                `
+
+            reactor_tycoon.element.toOnElement(currentMap.building_site, 0)
             console.log(currentMap.building_site)
         }
     },
 
     element: {
-        toOnElement(lifeTimeElement, buildingSiteMap) {
-            if (buildingSiteMap < 1) return
-            let game = reactor_tycoon,
-                energyValue = game.controlPanel.energyValue,
-                energyCapacity = game.controlPanel.energyCapacity
+        toOnElement(building_site, id) {
+            console.log(`this is a building_site: ${building_site}`);
+            let element = building_site[id],
+                lifeTimeElement = element.LifeTime
+
+            if (element.ElementStatus === "on") return console.log('funfou!!!');
+            // if (buildingSiteMap < 1) return
+
+
 
             const cpt = setInterval(() => {
-                if (energyValue === energyCapacity) return
-                else energyValue++
+                let game = reactor_tycoon,
+                    energyValue = game.controlPanel.energyValue,
+                    energyCapacity = game.controlPanel.energyCapacity
 
+                if (energyValue === energyCapacity) return
+
+                energyValue++
                 lifeTimeElement--
+                localStorage.energyValue = energyValue
+                localStorage.energyCapacity = energyCapacity
+                reactor_tycoon.initGame()
 
                 console.log(`Energy_Value: ${energyValue}`)
                 console.log(`Life_Time_Component: ${lifeTimeElement}`)
@@ -81,7 +100,10 @@ reactor_tycoon = {
 
                 if (lifeTimeElement < 1) {
                     clearInterval(cpt)
-                    // 
+                    element.ElementStatus = 'on'
+                    console.log(element);
+
+                    // autoOnElement
                     // this.component[0].LifeTime = 5
                     // reactor_tycoon.toOnComponent()
                 }
@@ -91,12 +113,19 @@ reactor_tycoon = {
 
     actions: {
         converterEnergyToCash() {
-            if (this.energyValue < 1) return
+            if (localStorage.energyValue == 0) return
+            let game = reactor_tycoon
+            game.initGame()
 
-            this.cash = this.energyValue
-            this.energyValue = 0
+            let energyValue = game.controlPanel.energyValue,
+                cash = game.controlPanel.cash
 
-            console.log(this.cash)
+            if (game.controlPanel.energyValue < 1) return
+            cash += energyValue
+            localStorage.cash = cash
+            localStorage.energyValue = 0
+
+            game.initGame()
         }
 
         // Admin Functions 
@@ -123,19 +152,23 @@ reactor_tycoon = {
         if (localStorage.getItem('cash') === null) {
             localStorage.setItem('cash', this.controlPanel.cash)
             localStorage.setItem('mapOn', JSON.stringify(this.map[0]))
+            localStorage.setItem('energyValue', this.controlPanel.energyValue)
+            localStorage.setItem('energyCapacity', this.controlPanel.energyCapacity)
 
             console.log('put start configs...');
         } else {
-            this.controlPanel.cash = localStorage.cash
+            this.controlPanel.cash = Number(localStorage.cash)
             this.mapOn = JSON.parse(localStorage.mapOn)
+            this.controlPanel.energyValue = Number(localStorage.energyValue)
+            this.controlPanel.energyCapacity = Number(localStorage.energyCapacity)
 
             document.querySelector('.cash').textContent = localStorage.cash
+            document.querySelector('.energy').textContent = localStorage.energyValue
             console.log('get configs data...');
         }
 
         console.log(' ');
     }
-
 }
 
 reactor_tycoon.initGame()
