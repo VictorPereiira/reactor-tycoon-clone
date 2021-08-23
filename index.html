@@ -14,6 +14,11 @@
             box-sizing: border-box;
         } */
 
+        :root {
+            --blue: rgb(34, 42, 155);
+
+        }
+
         .game_header {
             display: flex;
             justify-content: space-between;
@@ -35,7 +40,7 @@
             height: 40px;
             padding: 40px;
             color: rgb(55, 172, 20);
-            background: rgb(34, 42, 155);
+            background: var(--blue);
         }
 
         .actions {
@@ -43,7 +48,25 @@
             justify-content: space-between;
         }
 
-        .build .build_container {
+        .menu_button,
+        .menu .menu_container {
+            background: var(--blue);
+            width: 40px;
+        }
+
+        .menu .menu_container {
+            position: absolute;
+            margin-top: 4px;
+        }
+
+        .menu .menu_element {
+            padding: 10px;
+            border: 1px solid black;
+        }
+
+
+        .mold_container {
+            background: var(--blue);
             width: 100%;
             position: absolute;
             background: rgb(45 54 76);
@@ -52,7 +75,7 @@
             border-top-right-radius: 5px;
         }
 
-        .build .build_header {
+        .mold .mold_header {
             display: flex;
             justify-content: space-between;
             height: 40px;
@@ -60,13 +83,13 @@
             align-items: center;
         }
 
-        .build .build_content {
+        .mold .mold_content {
             padding: 10px;
         }
 
-        .build .element_container {
-            padding: 5px;
-            background: rgb(110 120 245);
+        .mold .mold_content .build_element_container {
+            padding: 10px;
+            background: var(--blue);
             color: #fff;
             border-radius: 10px;
         }
@@ -81,11 +104,12 @@
 
 
     <div class="actions">
-        <button class="buy">🔨</button>
+        <button class="menu_button">Ⓜ</button>
         <button class="convertButton"> ⚡ -> 💸</button>
     </div>
 
-    <div class="build"></div>
+    <div class="menu"></div>
+    <div class="mold"></div>
     <div class="map"></div>
 
     <script src="script.js"></script>

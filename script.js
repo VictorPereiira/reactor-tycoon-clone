@@ -37,17 +37,13 @@ const initGame = () => {
     document.querySelector('.energy').textContent = localStorage.energy
     document.querySelector('.cash').textContent = localStorage.cash
 
-    document.querySelector('.buy').addEventListener('click', () => {
-        access("draw").build()
+    document.querySelector('.menu_button').addEventListener('click', () => {
+        access("draw").menu()
     })
 
     document.querySelector('.convertButton').addEventListener('click', () => {
         access("actions").converterEnergyToCash()
     })
-    document.querySelector('.convertButton').addEventListener('click', () => {
-        access("actions").converterEnergyToCash()
-    })
-
 }
 
 const draw = () => {
@@ -80,47 +76,73 @@ const draw = () => {
             }
         },
 
+        menu: () => {
+            document.querySelector('.menu').innerHTML = `
+                <div class="menu_container">
+                   <div class="menu_element hammer">🔨</div>
+                   <div class="menu_element upgrade">🔝</div>
+                   <div class="menu_element search">🧪</div>
+                   <div class="menu_element delete">❌</div>
+                   <div class="menu_element help">❔</div>
+                   <div class="menu_element stats">🧮</div>
+                   <div class="menu_element settings">🎡</div>
+                </div>
+            `
+
+            document.querySelector('.menu_button').addEventListener('click', () => {
+                access("draw").menu()
+            })
+
+            document.querySelector('.menu .hammer').addEventListener('click', () => {
+                access("draw").build()
+            })
+        },
+
+        mold: (title) => {
+            document.querySelector('.mold').innerHTML = `
+                <section class="mold_container">
+                    <header class="mold_header">
+                        <button class="close">Close</button>
+                        <h2>${title}</h2>
+                        <button>⚡ -> 💸</button>
+                    </header>
+                    <main class="mold_content"></main>
+                </section >
+             `
+
+            document.querySelector('.menu_button').style.display = 'none'
+            document.querySelector('.convertButton').style.display = 'none'
+            document.querySelector('.menu').innerHTML = ' '
+
+            document.querySelector('.mold .close').addEventListener('click', () => {
+                document.querySelector('.mold').innerHTML = ' '
+                document.querySelector('.menu_button').style.display = 'inline'
+                document.querySelector('.convertButton').style.display = 'inline'
+            })
+        },
+
         build: () => {
             console.log('drawing build...')
             console.log(' ')
 
-            document.querySelector('.buy').style.display = 'none'
-            document.querySelector('.convertButton').style.display = 'none'
-            document.querySelector('.map').style.display = 'none'
-            document.querySelector('.build').innerHTML = `
-                <section class="build_container">
-                    <header class="build_header">
-                        <button class="close">Close</button>
-                        <h2>BUILD</h2>
-                        <button>⚡ -> 💸</button>
-                    </header>
-                    <main class="build_content">
-                        <div class="element_container" onclick='access("actions").buy(0, 1)'>
-                            ⛲
-                            <h3>WIND TURBINE</h3>
-                            <div>
-                                <span>1</span>
-                                💲
-                            </div>
-                            <p>PRODUCES 1.00 POWER</p>
-                            <small>LIFETIME: 5</small>
-                        </div>
-                    </main>
-                </section>
+            access("draw").mold('BUILD')
+            document.querySelector('.mold .mold_content').innerHTML = `
+                <div class="build_element_container" onclick='access("actions").buy(0, 1)'>
+                    ⛲
+                    <h3>WIND TURBINE</h3>
+                    <div>
+                        <span>1</span>
+                        💲
+                    </div>
+                    <p>PRODUCES 1.00 POWER</p>
+                    <small>LIFETIME: 5</small>
+                </div>
             `
 
-            document.querySelector('.build .close').addEventListener('click', () => {
-                document.querySelector('.build').innerHTML = ' '
-                document.querySelector('.buy').style.display = 'inline'
+            document.querySelector('.mold .mold_content .build_element_container ').addEventListener('click', () => {
+                document.querySelector('.mold').innerHTML = ' '
+                document.querySelector('.menu_button').style.display = 'inline'
                 document.querySelector('.convertButton').style.display = 'inline'
-                document.querySelector('.map').style.display = 'block'
-            })
-
-            document.querySelector('.build .element_container').addEventListener('click', () => {
-                document.querySelector('.build').innerHTML = ' '
-                document.querySelector('.buy').style.display = 'inline'
-                document.querySelector('.convertButton').style.display = 'inline'
-                document.querySelector('.map').style.display = 'block'
             })
         }
     }
