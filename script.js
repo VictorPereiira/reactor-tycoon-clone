@@ -2,23 +2,21 @@ const initGame = () => {
     if (localStorage.getItem('energy') === null) {
         let map = [
             {
-                'size': 10,
-                'trees': 2,
-                'mountains': 2,
-                'building_site': [
+                'size': 70,
+                'free_place': 48,
+                'trees': [
                     {
                         'id': 0,
-                        'idMap': 0,
-                        'name': 'Wind Turbine',
-                        'elementStatus': 'off'
-                    },
-                    {
-                        'id': 0,
-                        'idMap': 0,
-                        'name': 'Wind Turbine',
-                        'elementStatus': 'off'
+                        'destruct_value': 4
                     }
                 ],
+                'mountains': [
+                    {
+                        'id': 0,
+                        'destruct_value': 4
+                    }
+                ],
+                'building_site': [],
                 'state': 'open',
                 'value_island': 0
             }
@@ -26,7 +24,7 @@ const initGame = () => {
 
         localStorage.setItem('energy', 0)
         localStorage.setItem('energyCapacity', 200)
-        localStorage.setItem('cash', 0)
+        localStorage.setItem('cash', 1)
         localStorage.setItem('mapOn', JSON.stringify(map[0]))
 
         console.log('initGame... with config start');
@@ -34,38 +32,97 @@ const initGame = () => {
         console.log('initGame... with config salved');
     }
 
-    draw()
+    access("draw").map()
+    access("element").callToAllElements()
     document.querySelector('.energy').textContent = localStorage.energy
     document.querySelector('.cash').textContent = localStorage.cash
+
+    document.querySelector('.buy').addEventListener('click', () => {
+        access("draw").build()
+    })
 
     document.querySelector('.convertButton').addEventListener('click', () => {
         access("actions").converterEnergyToCash()
     })
+    document.querySelector('.convertButton').addEventListener('click', () => {
+        access("actions").converterEnergyToCash()
+    })
+
 }
 
 const draw = () => {
     console.log('draw...');
     console.log(' ');
 
-    let currentMap = JSON.parse(localStorage.mapOn),
-        buildingSite = currentMap.building_site
+    return {
+        map: () => {
+            console.log('drawing map...');
+            document.querySelector('.map').innerHTML = ' '
 
-    for (let i in buildingSite) {
-        let element = buildingSite[i],
-            idElement = element.id,
-            idMap = element.id + i,
-            nameElement = element.name
+            let currentMap = JSON.parse(localStorage.mapOn),
+                buildingSite = currentMap.building_site
 
-        buildingSite[i].idMap = idMap
-        localStorage.mapOn = JSON.stringify(currentMap)
-        console.log(currentMap);
+            for (let i in buildingSite) {
+                let element = buildingSite[i],
+                    idElement = element.id,
+                    idMap = element.id + i,
+                    nameElement = element.name
 
-        document.querySelector('.map').innerHTML += `
-                    <div class="elementContainer" onclick='access("element").toOnElement(${idElement}, ${idMap})'>
+                buildingSite[i].idMap = idMap
+                localStorage.mapOn = JSON.stringify(currentMap)
+
+                document.querySelector('.map').innerHTML += `
+                    <div class="elementContainer" onclick='access("element").toOnElement{idElement}, ${idMap})'>
                         <div>${nameElement}</div>
                         <div>${idMap}</div>
                     </div>
-                    `
+                `
+            }
+        },
+
+        build: () => {
+            console.log('drawing build...')
+            console.log(' ')
+
+            document.querySelector('.buy').style.display = 'none'
+            document.querySelector('.convertButton').style.display = 'none'
+            document.querySelector('.map').style.display = 'none'
+            document.querySelector('.build').innerHTML = `
+                <section class="build_container">
+                    <header class="build_header">
+                        <button class="close">Close</button>
+                        <h2>BUILD</h2>
+                        <button>⚡ -> 💸</button>
+                    </header>
+                    <main class="build_content">
+                        <div class="element_container" onclick='access("actions").buy(0, 1)'>
+                            ⛲
+                            <h3>WIND TURBINE</h3>
+                            <div>
+                                <span>1</span>
+                                💲
+                            </div>
+                            <p>PRODUCES 1.00 POWER</p>
+                            <small>LIFETIME: 5</small>
+                        </div>
+                    </main>
+                </section>
+            `
+
+            document.querySelector('.build .close').addEventListener('click', () => {
+                document.querySelector('.build').innerHTML = ' '
+                document.querySelector('.buy').style.display = 'inline'
+                document.querySelector('.convertButton').style.display = 'inline'
+                document.querySelector('.map').style.display = 'block'
+            })
+
+            document.querySelector('.build .element_container').addEventListener('click', () => {
+                document.querySelector('.build').innerHTML = ' '
+                document.querySelector('.buy').style.display = 'inline'
+                document.querySelector('.convertButton').style.display = 'inline'
+                document.querySelector('.map').style.display = 'block'
+            })
+        }
     }
 }
 
@@ -85,12 +142,15 @@ const createElement = () => {
     ]
 
     return {
+        box: (id) => {
+            return box[id]
+        },
+
         toOnElement: (id, idMap) => {
             console.log('toOnElement...')
             console.log(' ')
 
             idMap = Math.floor(Number(idMap))
-            console.log(idMap);
 
             let currentMap = JSON.parse(localStorage.mapOn),
                 element = currentMap.building_site[idMap]
@@ -99,7 +159,7 @@ const createElement = () => {
             if (element.elementStatus === "on") {
                 localStorage.mapOn = JSON.stringify(currentMap)
                 return console.log('This element is work 🛠')
-                console.log(' ');
+
             } else {
                 console.log('tuOn: ' + idMap + ' element');
                 element.elementStatus = "on"
@@ -107,34 +167,47 @@ const createElement = () => {
             }
 
             let lifeTimeElement = box[id].lifeTime,
-                energyCapacity = localStorage.energyCapacity,
-                cpt = setInterval(function () {
-                    let energyValue = localStorage.energy
+                energyCapacity = localStorage.energyCapacity
 
-                    if (energyValue === energyCapacity) {
-                        return console.log('You reached the maximum energyCapacity ⚠');
-                    }
+            const cpt = setInterval(() => {
+                let energyValue = localStorage.energy
 
-                    energyValue++
-                    lifeTimeElement--
-                    localStorage.energy = energyValue
-                    document.querySelector('.energy').textContent = energyValue
+                if (energyValue === energyCapacity) {
+                    clearInterval(cpt)
+                    return console.log('You reached the maximum energyCapacity ⚠');
+                }
 
-                    if (lifeTimeElement < 1) {
-                        console.log('element: ' + idMap + ' is finished');
-                        console.log(' ');
+                energyValue++
+                lifeTimeElement--
+                localStorage.energy = energyValue
+                document.querySelector('.energy').textContent = energyValue
 
-                        clearInterval(cpt)
-                        element.elementStatus = 'off'
-                        lifeTimeElement = box[id].lifeTime
-                        localStorage.mapOn = JSON.stringify(currentMap)
-                        access("element").toOnElement(id, idMap)
+                if (lifeTimeElement < 1) {
+                    console.log('element: ' + idMap + ' is finished');
+                    console.log(' ');
 
-                        // autoOnElement
-                        // this.component[0].LifeTime = 5
-                        // reactor_tycoon.toOnComponent()
-                    }
-                }, 1000)
+                    element.elementStatus = 'off'
+                    localStorage.setItem('mapOn', JSON.stringify(currentMap))
+                    clearInterval(cpt)
+                    access("element").toOnElement(id, idMap)
+                }
+            }, 1000)
+        },
+
+        callToAllElements: () => {
+            console.log('callToAllElements...')
+            let currentMap = JSON.parse(localStorage.mapOn)
+
+            for (let i in currentMap.building_site) {
+                let element = currentMap.building_site[i],
+                    idEl = element.id
+
+
+                element.elementStatus = 'off'
+                localStorage.mapOn = JSON.stringify(currentMap)
+                access("element").toOnElement(idEl, i)
+            }
+            console.log(' ')
         }
     }
 }
@@ -148,42 +221,90 @@ const actions = () => {
             console.log(' ')
 
             let energyValue = Number(localStorage.energy),
+                energyCapacity = Number(localStorage.energyCapacity),
                 cashValue = Number(localStorage.cash)
 
+
             if (energyValue < 1) return console.log('You not have energy! ⚡')
+            if (energyValue === energyCapacity) access("element").callToAllElements()
             cashValue += energyValue
             energyValue = 0
+
 
             localStorage.cash = cashValue
             localStorage.energy = energyValue
             document.querySelector('.cash').textContent = cashValue
             document.querySelector('.energy').textContent = energyValue
+        },
+
+        buy: (id, quantity) => {
+            console.log('buy...')
+            console.log(' ')
+
+
+
+            let elementBuy = access("element").box(id),
+                cashValue = localStorage.cash,
+                valueBuy = elementBuy.unitValue * quantity
+
+
+            if (cashValue >= valueBuy) {
+                console.log('buying...')
+                console.log(' ');
+
+                cashValue -= valueBuy
+                localStorage.cash = cashValue
+                document.querySelector('.cash').textContent = cashValue
+
+
+                access("actions").putOnTheMap(elementBuy, quantity)
+            }
+            else console.log('You not have cash! 😞')
+        },
+
+        putOnTheMap(elementBuy, quantity) {
+            console.log('putOnTheMap...');
+            console.log(' ');
+
+            let currentMap = JSON.parse(localStorage.mapOn),
+                building_site = currentMap.building_site,
+                count = 0
+
+            while (count < quantity) {
+                building_site.push(elementBuy)
+                quantity--
+            }
+
+            localStorage.mapOn = JSON.stringify(currentMap)
+            access("draw").map()
+            access("element").callToAllElements()
         }
     }
 }
-
 
 const access = (resq) => {
     console.log('access...');
 
     if (resq === 'initGame') return initGame()
+    if (resq === 'draw') return draw()
     if (resq === 'element') return createElement()
     if (resq === 'actions') return actions()
 }
 
 
-        // Admin Functions 
-        // addElement(imgEL, nameEL, unitValueEL, productionEL, lifeTimeEl, levelEL = 1) {
-        //     if (typeof (imgEl) !== string) return
-        //     if (typeof (nameEl) !== string) return
+// Admin Functions 
+// addElement(imgEL, nameEL, unitValueEL, productionEL, lifeTimeEl, levelEL = 1) {
+//     if (typeof (imgEl) !== string) return
+//     if (typeof (nameEl) !== string) return
 
-        //     let newElement = {
-        //         'Img': imgEL,
-        //         'Name': nameEL,
-        //         'UnitValue': unitValueEL,
-        //         'Production': productionEL,
-        //         'LifeTime': lifeTimeEl,
-        //         'level': levelEL
-        //     }
-        //     this.box.dataShopping.push(newElement)
-        // }
+//     let newElement = {
+//         'Img': imgEL,
+//         'Name': nameEL,
+//         'UnitValue': unitValueEL,
+//         'Production': productionEL,
+//         'LifeTime': lifeTimeEl,
+//         'level': levelEL
+//     }
+//     this.box.dataShopping.push(newElement)
+// }
+

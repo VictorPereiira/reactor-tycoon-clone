@@ -8,6 +8,17 @@
     <title>Game</title>
 
     <style>
+        /* * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        } */
+
+        .game_header {
+            display: flex;
+            justify-content: space-between;
+        }
+
         .map {
             display: flex;
             justify-content: space-evenly;
@@ -26,14 +37,55 @@
             color: rgb(55, 172, 20);
             background: rgb(34, 42, 155);
         }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .build .build_container {
+            width: 100%;
+            position: absolute;
+            background: rgb(45 54 76);
+            height: 90vh;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .build .build_header {
+            display: flex;
+            justify-content: space-between;
+            height: 40px;
+            padding: 10px;
+            align-items: center;
+        }
+
+        .build .build_content {
+            padding: 10px;
+        }
+
+        .build .element_container {
+            padding: 5px;
+            background: rgb(110 120 245);
+            color: #fff;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
 <body>
-    <p>Cash: <span class="cash">0</span></p>
-    <p>Energy: <span class="energy">0</span></p>
-    <button class="convertButton"> ⚡ -> 💸</button>
+    <header class="game_header">
+        <p>⚡Energy: <span class="energy">0</span><span>/200</span></p>
+        <p>💲Cash: <span class="cash">0</span></p>
+    </header>
 
+
+    <div class="actions">
+        <button class="buy">🔨</button>
+        <button class="convertButton"> ⚡ -> 💸</button>
+    </div>
+
+    <div class="build"></div>
     <div class="map"></div>
 
     <script src="script.js"></script>
