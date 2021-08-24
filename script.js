@@ -32,11 +32,14 @@ const initGame = () => {
         console.log('initGame... with config salved');
     }
 
+    access("toDom")
     access("draw").map()
     access("element").callToAllElements()
     document.querySelector('.energy').textContent = localStorage.energy
     document.querySelector('.cash').textContent = localStorage.cash
+}
 
+const toDOM = () => {
     document.querySelector('.menu_button').addEventListener('click', () => {
         access("draw").menu()
     })
@@ -48,7 +51,6 @@ const initGame = () => {
 
 const draw = () => {
     console.log('draw...');
-    console.log(' ');
 
     return {
         map: () => {
@@ -60,15 +62,15 @@ const draw = () => {
 
             for (let i in buildingSite) {
                 let element = buildingSite[i],
+                    nameElement = element.name,
                     idElement = element.id,
-                    idMap = element.id + i,
-                    nameElement = element.name
+                    idMap = i
 
                 buildingSite[i].idMap = idMap
                 localStorage.mapOn = JSON.stringify(currentMap)
 
                 document.querySelector('.map').innerHTML += `
-                    <div class="elementContainer" onclick='access("element").toOnElement{idElement}, ${idMap})'>
+                    <div class="elementContainer" onclick='access("element").toOnElement(${idElement}, ${idMap})'>
                         <div>${nameElement}</div>
                         <div>${idMap}</div>
                     </div>
@@ -89,10 +91,6 @@ const draw = () => {
                 </div>
             `
 
-            document.querySelector('.menu_button').addEventListener('click', () => {
-                access("draw").menu()
-            })
-
             document.querySelector('.menu .hammer').addEventListener('click', () => {
                 access("draw").build()
             })
@@ -100,7 +98,7 @@ const draw = () => {
 
         mold: (title) => {
             document.querySelector('.mold').innerHTML = `
-                <section class="mold_container">
+                    <section class="mold_container" >
                     <header class="mold_header">
                         <button class="close">Close</button>
                         <h2>${title}</h2>
@@ -108,7 +106,7 @@ const draw = () => {
                     </header>
                     <main class="mold_content"></main>
                 </section >
-             `
+    `
 
             document.querySelector('.menu_button').style.display = 'none'
             document.querySelector('.convertButton').style.display = 'none'
@@ -127,7 +125,7 @@ const draw = () => {
 
             access("draw").mold('BUILD')
             document.querySelector('.mold .mold_content').innerHTML = `
-                <div class="build_element_container" onclick='access("actions").buy(0, 1)'>
+                <div class="build_element_container" onclick = 'access("actions").buy(0, 1)' >
                     ⛲
                     <h3>WIND TURBINE</h3>
                     <div>
@@ -136,7 +134,7 @@ const draw = () => {
                     </div>
                     <p>PRODUCES 1.00 POWER</p>
                     <small>LIFETIME: 5</small>
-                </div>
+                </div >
             `
 
             document.querySelector('.mold .mold_content .build_element_container ').addEventListener('click', () => {
@@ -169,51 +167,34 @@ const createElement = () => {
         },
 
         toOnElement: (id, idMap) => {
-            console.log('toOnElement...')
-            console.log(' ')
-
             idMap = Math.floor(Number(idMap))
 
-            let currentMap = JSON.parse(localStorage.mapOn),
+            let energyValue = Number(localStorage.energy),
+                energyCapacity = Number(localStorage.energyCapacity,)
+            currentMap = JSON.parse(localStorage.mapOn),
                 element = currentMap.building_site[idMap]
 
-
-            if (element.elementStatus === "on") {
-                localStorage.mapOn = JSON.stringify(currentMap)
-                return console.log('This element is work 🛠')
-
-            } else {
-                console.log('tuOn: ' + idMap + ' element');
-                element.elementStatus = "on"
+            if (element.elementStatus === 'on') return console.log('This element is work 🛠')
+            else {
+                element.elementStatus = 'on'
                 localStorage.mapOn = JSON.stringify(currentMap)
             }
 
-            let lifeTimeElement = box[id].lifeTime,
-                energyCapacity = localStorage.energyCapacity
-
             const cpt = setInterval(() => {
-                let energyValue = localStorage.energy
-
                 if (energyValue === energyCapacity) {
                     clearInterval(cpt)
                     return console.log('You reached the maximum energyCapacity ⚠');
                 }
 
-                energyValue++
-                lifeTimeElement--
+                element.elementStatus = 'off'
+                energyValue += Number(element.production * element.lifeTime)
                 localStorage.energy = energyValue
                 document.querySelector('.energy').textContent = energyValue
+                localStorage.setItem('mapOn', JSON.stringify(currentMap))
+                clearInterval(cpt)
+                access("element").toOnElement(id, idMap)
 
-                if (lifeTimeElement < 1) {
-                    console.log('element: ' + idMap + ' is finished');
-                    console.log(' ');
-
-                    element.elementStatus = 'off'
-                    localStorage.setItem('mapOn', JSON.stringify(currentMap))
-                    clearInterval(cpt)
-                    access("element").toOnElement(id, idMap)
-                }
-            }, 1000)
+            }, element.lifeTime * 1000)
         },
 
         callToAllElements: () => {
@@ -239,31 +220,29 @@ const actions = () => {
 
     return {
         converterEnergyToCash: () => {
-            console.log('converter cash...');
+            console.log('converter cash...')
             console.log(' ')
 
             let energyValue = Number(localStorage.energy),
                 energyCapacity = Number(localStorage.energyCapacity),
-                cashValue = Number(localStorage.cash)
-
+                cashValue = Number(localStorage.cash),
+                fullCapacity
 
             if (energyValue < 1) return console.log('You not have energy! ⚡')
-            if (energyValue === energyCapacity) access("element").callToAllElements()
+            if (energyValue === energyCapacity) fullCapacity = true
             cashValue += energyValue
             energyValue = 0
-
 
             localStorage.cash = cashValue
             localStorage.energy = energyValue
             document.querySelector('.cash').textContent = cashValue
             document.querySelector('.energy').textContent = energyValue
+            if (fullCapacity) access("element").callToAllElements()
         },
 
         buy: (id, quantity) => {
             console.log('buy...')
             console.log(' ')
-
-
 
             let elementBuy = access("element").box(id),
                 cashValue = localStorage.cash,
@@ -272,7 +251,7 @@ const actions = () => {
 
             if (cashValue >= valueBuy) {
                 console.log('buying...')
-                console.log(' ');
+                console.log(' ')
 
                 cashValue -= valueBuy
                 localStorage.cash = cashValue
@@ -285,7 +264,7 @@ const actions = () => {
         },
 
         putOnTheMap(elementBuy, quantity) {
-            console.log('putOnTheMap...');
+            console.log('putOnTheMap...')
             console.log(' ');
 
             let currentMap = JSON.parse(localStorage.mapOn),
@@ -298,17 +277,16 @@ const actions = () => {
             }
 
             localStorage.mapOn = JSON.stringify(currentMap)
-            access("draw").map()
             access("element").callToAllElements()
+            access("draw").map()
         }
     }
 }
 
 const access = (resq) => {
-    console.log('access...');
-
     if (resq === 'initGame') return initGame()
     if (resq === 'draw') return draw()
+    if (resq === 'toDom') return toDOM()
     if (resq === 'element') return createElement()
     if (resq === 'actions') return actions()
 }

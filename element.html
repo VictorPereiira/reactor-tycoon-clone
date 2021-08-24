@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        let energyValue = 0,
+            energyCapacity = 200
+
+        const element = [
+            {
+                'production': 1,
+                'lifeTime': 5,
+                'status': 'off',
+            },
+            {
+                'production': 1,
+                'lifeTime': 5,
+                'status': 'off',
+            }
+        ]
+
+        function toOnElement(id) {
+            if (element[id].status === 'on') return
+            else element[id].status = 'on'
+
+            let cpt = setInterval(() => {
+                if (energyValue === energyCapacity) {
+                    clearInterval(cpt)
+                    return console.log('You reached the maximum energyCapacity ⚠');
+                }
+
+                energyValue += element[id].production * element[id].lifeTime
+                console.log(energyValue);
+
+                element[id].status = 'off'
+                clearInterval(cpt)
+                toOnElement(id)
+
+            }, element[id].lifeTime * 1000)
+        }
+
+    </script>
+</body>
+
+</html>
