@@ -1,4 +1,4 @@
-import access from './resources.js'
+import resources from './resources.js'
 
 export default function createElement() {
     console.log('creatElement...');

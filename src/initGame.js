@@ -3,7 +3,6 @@ import resources from './resources.js'
 export default function initGame() {
     if (localStorage.getItem('energy') === null) {
         let map = resources('access', 'createMaps')
-        console.log(map)
 
         localStorage.setItem('energy', 0)
         localStorage.setItem('energyCapacity', 200)

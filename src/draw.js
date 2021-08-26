@@ -1,11 +1,8 @@
-import access from './resources.js'
+import resources from './resources.js';
 
 export default function draw() {
-    console.log('draw...');
-
     return {
         map: () => {
-            console.log('drawing map...');
             document.querySelector('.map').innerHTML = ' '
 
             let currentMap = JSON.parse(localStorage.mapOn),
@@ -43,7 +40,7 @@ export default function draw() {
             `
 
             document.querySelector('.menu .hammer').addEventListener('click', () => {
-                access("draw").build()
+                draw().build()
             })
         },
 
@@ -71,12 +68,9 @@ export default function draw() {
         },
 
         build: () => {
-            console.log('drawing build...')
-            console.log(' ')
-
-            access("draw").mold('BUILD')
+            resources('access', 'draw').mold('BUILD')
             document.querySelector('.mold .mold_content').innerHTML = `
-                <div class="build_element_container" onclick = 'access("actions").buy(0, 1)' >
+                <div class="build_element_container" id="0">
                     ⛲
                     <h3>WIND TURBINE</h3>
                     <div>
@@ -88,7 +82,16 @@ export default function draw() {
                 </div >
             `
 
-            document.querySelector('.mold .mold_content .build_element_container ').addEventListener('click', () => {
+            document.querySelector('.mold .mold_content .build_element_container ').addEventListener('click', e => {
+                let pathId,
+                    idEl
+
+                for (let i in e.path) {
+                    pathId = Number(e.path[i].id)
+                    if (pathId >= 0) idEl = pathId
+                }
+
+                resources('access', 'actions').buy(idEl)
                 document.querySelector('.mold').innerHTML = ' '
                 document.querySelector('.menu_button').style.display = 'inline'
                 document.querySelector('.convertButton').style.display = 'inline'

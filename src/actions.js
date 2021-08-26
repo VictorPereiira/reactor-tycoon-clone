@@ -1,4 +1,4 @@
-import access from './resources.js'
+import resources from './resources.js'
 
 export default function actions() {
     console.log('actions...');
@@ -25,11 +25,11 @@ export default function actions() {
             if (fullCapacity) access("element").callToAllElements()
         },
 
-        buy: (id, quantity) => {
+        buy: (id, quantity = 1) => {
             console.log('buy...')
             console.log(' ')
 
-            let elementBuy = access("element").box(id),
+            let elementBuy = resources('access', 'element').box(id),
                 cashValue = localStorage.cash,
                 valueBuy = elementBuy.unitValue * quantity
 
@@ -43,7 +43,7 @@ export default function actions() {
                 document.querySelector('.cash').textContent = cashValue
 
 
-                access("actions").putOnTheMap(elementBuy, quantity)
+                resources('access', 'actions').putOnTheMap(elementBuy, quantity)
             }
             else console.log('You not have cash! 😞')
         },
@@ -62,8 +62,8 @@ export default function actions() {
             }
 
             localStorage.mapOn = JSON.stringify(currentMap)
-            access("element").callToAllElements()
-            access("draw").map()
+            resources('access', 'element').callToAllElements()
+            resources('access', 'draw').map()
         }
     }
 }
