@@ -4,7 +4,7 @@ export default function actions() {
     console.log('actions...');
 
     return {
-        converterEnergyToCash: () => {
+        convertToCash: () => {
             console.log('converter cash...')
             console.log(' ')
 

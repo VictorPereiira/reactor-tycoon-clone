@@ -1,4 +1,5 @@
 import initGame from './initGame.js'
+import createMaps from './maps.js'
 import draw from './draw.js'
 import createElement from './element.js'
 import actions from './actions.js'
@@ -6,6 +7,7 @@ import actions from './actions.js'
 export default function resources(func, method) {
     const access = (resq) => {
         if (resq === 'initGame') return initGame()
+        if (resq === 'createMaps') return createMaps()
         if (resq === 'draw') return draw()
         if (resq === 'element') return createElement()
         if (resq === 'actions') return actions()
@@ -26,3 +28,5 @@ export default function resources(func, method) {
     if (func === 'access') return access(method)
     if (func === 'toDOM') return toDOM(method)
 }
+
+

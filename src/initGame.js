@@ -2,27 +2,8 @@ import resources from './resources.js'
 
 export default function initGame() {
     if (localStorage.getItem('energy') === null) {
-        let map = [
-            {
-                'size': 70,
-                'free_place': 48,
-                'trees': [
-                    {
-                        'id': 0,
-                        'destruct_value': 4
-                    }
-                ],
-                'mountains': [
-                    {
-                        'id': 0,
-                        'destruct_value': 4
-                    }
-                ],
-                'building_site': [],
-                'state': 'open',
-                'value_island': 0
-            }
-        ]
+        let map = resources('access', 'createMaps')
+        console.log(map)
 
         localStorage.setItem('energy', 0)
         localStorage.setItem('energyCapacity', 200)
@@ -35,6 +16,7 @@ export default function initGame() {
     }
 
     resources('toDOM', 'menu')
+    resources('toDOM', 'convertToCash')
     resources('access', 'draw').map()
     resources('element', 'callToAllElements')
 
