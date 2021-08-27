@@ -1,32 +1,16 @@
 import resources from './resources.js'
 
-export default function createElement() {
-    console.log('creatElement...');
-
-    let box = [
-        {
-            'id': 0,
-            'idMap': 0,
-            'name': 'Wind Turbine',
-            'unitValue': 1,
-            'production': 1,
-            'lifeTime': 5,
-            'elementStatus': 'off'
-        }
-    ]
+export default function Element() {
 
     return {
-        box: (id) => {
-            return box[id]
-        },
-
         toOnElement: (id, idMap) => {
             idMap = Math.floor(Number(idMap))
 
             let energyValue = Number(localStorage.energy),
-                energyCapacity = Number(localStorage.energyCapacity,)
-            currentMap = JSON.parse(localStorage.mapOn),
-                element = currentMap.building_site[idMap]
+                energyCapacity = Number(localStorage.energyCapacity),
+                currentMap = JSON.parse(localStorage.mapOn),
+                element = resources('access', 'element').box(0),
+                lifeTime = element.lifeTime
 
             if (element.elementStatus === 'on') return console.log('This element is work 🛠')
             else {
@@ -40,15 +24,19 @@ export default function createElement() {
                     return console.log('You reached the maximum energyCapacity ⚠');
                 }
 
-                element.elementStatus = 'off'
-                energyValue += Number(element.production * element.lifeTime)
+                // energyValue += Number(element.production * element.lifeTime)
+                energyValue++
+                lifeTime--
                 localStorage.energy = energyValue
                 document.querySelector('.energy').textContent = energyValue
-                localStorage.setItem('mapOn', JSON.stringify(currentMap))
-                clearInterval(cpt)
-                access("element").toOnElement(id, idMap)
 
-            }, element.lifeTime * 1000)
+                if (lifeTime < 0) {
+                    element.elementStatus = 'off'
+                    clearInterval(cpt)
+                    createElement().toOnElement(id, idMap)
+                }
+
+            }, 1000) //  element.lifeTime * 1000
         },
 
         callToAllElements: () => {
@@ -62,25 +50,45 @@ export default function createElement() {
 
                 element.elementStatus = 'off'
                 localStorage.mapOn = JSON.stringify(currentMap)
-                access("element").toOnElement(idEl, i)
+                createElement().toOnElement(idEl, i)
             }
             console.log(' ')
         }
     }
 }
 
-// Admin Functions
-// addElement(imgEL, nameEL, unitValueEL, productionEL, lifeTimeEl, levelEL = 1) {
-//     if (typeof (imgEl) !== string) return
-//     if (typeof (nameEl) !== string) return
+function createBox(dataElements) {
+    let dataBox = []
 
-//     let newElement = {
-//         'Img': imgEL,
-//         'Name': nameEL,
-//         'UnitValue': unitValueEL,
-//         'Production': productionEL,
-//         'LifeTime': lifeTimeEl,
-//         'level': levelEL
-//     }
-//     this.box.dataShopping.push(newElement)
-// }
+    for (let i in dataElements) {
+        let dataEl = dataElements[i]
+
+        dataBox.push({
+            'id': i,
+            'idMap': 0,
+            'name': dataEl[0],
+            'group': dataEl[1],
+            'unitValue': dataEl[2],
+            'production': [
+                { 'lv': 0, 'value': dataEl[3] }
+            ],
+            'lifeTime': [
+                { 'lv': 0, 'value': dataEl[4] }
+            ],
+            'update': 'off',
+            'elementStatus': 'off',
+            'img': dataEl[5]
+        })
+    }
+
+    return dataBox
+}
+
+let dataElements = [
+    ['Wind Turbine', 'Heaters', 1, 1, 5, '<img src="../public/wind-turbine.svg">'],
+    ['Solar Painel', 'Heaters', 200, 10, 30, '<img src="../public/wind-turbine.svg">']
+    // [nameEl, groupEl, unitValueEL, productionEL, lifeTimeEl, imgEl]
+]
+
+let box = createBox(dataElements)
+console.log(box);

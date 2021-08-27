@@ -1,4 +1,4 @@
-import access from './resources.js'
+import resources from '../resources.js'
 
 function mapGenerator(size, tress, mountains, value) {
     let free_place,

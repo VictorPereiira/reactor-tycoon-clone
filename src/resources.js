@@ -1,14 +1,16 @@
 import initGame from './initGame.js'
-import createMaps from './maps.js'
 import draw from './draw.js'
+import createMaps from './constructors/maps.js'
+import build from './constructors/build.js'
 import createElement from './element.js'
 import actions from './actions.js'
 
 export default function resources(func, method) {
     const access = (resq) => {
         if (resq === 'initGame') return initGame()
-        if (resq === 'createMaps') return createMaps()
         if (resq === 'draw') return draw()
+        if (resq === 'createMaps') return createMaps()
+        if (resq === 'build') return build()
         if (resq === 'element') return createElement()
         if (resq === 'actions') return actions()
     }
@@ -23,6 +25,12 @@ export default function resources(func, method) {
             .addEventListener('click', () => {
                 access('actions').convertToCash()
             })
+
+        if (docAccess === 'menuItens') {
+            document.querySelector('.menu .hammer').addEventListener('click', () => {
+                access('draw').build()
+            })
+        }
     }
 
     if (func === 'access') return access(method)

@@ -1,13 +1,8 @@
 import resources from './resources.js'
 
 export default function actions() {
-    console.log('actions...');
-
     return {
         convertToCash: () => {
-            console.log('converter cash...')
-            console.log(' ')
-
             let energyValue = Number(localStorage.energy),
                 energyCapacity = Number(localStorage.energyCapacity),
                 cashValue = Number(localStorage.cash),
@@ -49,15 +44,11 @@ export default function actions() {
         },
 
         putOnTheMap(elementBuy, quantity) {
-            console.log('putOnTheMap...')
-            console.log(' ');
-
             let currentMap = JSON.parse(localStorage.mapOn),
-                building_site = currentMap.building_site,
                 count = 0
 
             while (count < quantity) {
-                building_site.push(elementBuy)
+                currentMap.building_site.push(elementBuy)
                 quantity--
             }
 

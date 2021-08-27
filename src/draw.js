@@ -19,8 +19,7 @@ export default function draw() {
 
                 document.querySelector('.map').innerHTML += `
                     <div class="elementContainer" onclick='access("element").toOnElement(${idElement}, ${idMap})'>
-                        <div>${nameElement}</div>
-                        <div>${idMap}</div>
+                        ${element.img}
                     </div>
                 `
             }
@@ -39,9 +38,7 @@ export default function draw() {
                 </div>
             `
 
-            document.querySelector('.menu .hammer').addEventListener('click', () => {
-                draw().build()
-            })
+            resources('toDOM', 'menuItens')
         },
 
         mold: (title) => {
@@ -68,21 +65,10 @@ export default function draw() {
         },
 
         build: () => {
-            resources('access', 'draw').mold('BUILD')
-            document.querySelector('.mold .mold_content').innerHTML = `
-                <div class="build_element_container" id="0">
-                    ⛲
-                    <h3>WIND TURBINE</h3>
-                    <div>
-                        <span>1</span>
-                        💲
-                    </div>
-                    <p>PRODUCES 1.00 POWER</p>
-                    <small>LIFETIME: 5</small>
-                </div >
-            `
+            draw().mold('BUILD')
+            resources('access', 'build')
 
-            document.querySelector('.mold .mold_content .build_element_container ').addEventListener('click', e => {
+            document.querySelector('.mold .mold_content .build_element_container').addEventListener('click', e => {
                 let pathId,
                     idEl
 
