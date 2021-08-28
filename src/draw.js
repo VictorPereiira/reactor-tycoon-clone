@@ -18,7 +18,7 @@ export default function draw() {
                 localStorage.mapOn = JSON.stringify(currentMap)
 
                 document.querySelector('.map').innerHTML += `
-                    <div class="elementContainer" onclick='access("element").toOnElement(${idElement}, ${idMap})'>
+                    <div class="elementContainer" onclick="resources('access', 'element').toOnElement(${idElement}, ${idMap})">
                         ${element.img}
                     </div>
                 `
@@ -47,7 +47,7 @@ export default function draw() {
                     <header class="mold_header">
                         <button class="close">Close</button>
                         <h2>${title}</h2>
-                        <button>⚡ -> 💸</button>
+                        <button class="energyForCash">⚡ -> 💸</button>
                     </header>
                     <main class="mold_content"></main>
                 </section >
@@ -56,6 +56,10 @@ export default function draw() {
             document.querySelector('.menu_button').style.display = 'none'
             document.querySelector('.convertButton').style.display = 'none'
             document.querySelector('.menu').innerHTML = ' '
+
+            document.querySelector('.mold .energyForCash').addEventListener('click', () => {
+                resources('access', 'actions').convertToCash()
+            })
 
             document.querySelector('.mold .close').addEventListener('click', () => {
                 document.querySelector('.mold').innerHTML = ' '
@@ -67,21 +71,6 @@ export default function draw() {
         build: () => {
             draw().mold('BUILD')
             resources('access', 'build')
-
-            document.querySelector('.mold .mold_content .build_element_container').addEventListener('click', e => {
-                let pathId,
-                    idEl
-
-                for (let i in e.path) {
-                    pathId = Number(e.path[i].id)
-                    if (pathId >= 0) idEl = pathId
-                }
-
-                resources('access', 'actions').buy(idEl)
-                document.querySelector('.mold').innerHTML = ' '
-                document.querySelector('.menu_button').style.display = 'inline'
-                document.querySelector('.convertButton').style.display = 'inline'
-            })
         }
     }
 }

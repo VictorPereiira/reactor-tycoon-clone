@@ -17,26 +17,18 @@ export default function actions() {
             localStorage.energy = energyValue
             document.querySelector('.cash').textContent = cashValue
             document.querySelector('.energy').textContent = energyValue
-            if (fullCapacity) access("element").callToAllElements()
+            if (fullCapacity) resources('access', 'element').callToAllElements()
         },
 
         buy: (id, quantity = 1) => {
-            console.log('buy...')
-            console.log(' ')
-
-            let elementBuy = resources('access', 'element').box(id),
+            let elementBuy = resources('access', 'element').getBox(id),
                 cashValue = localStorage.cash,
                 valueBuy = elementBuy.unitValue * quantity
 
-
             if (cashValue >= valueBuy) {
-                console.log('buying...')
-                console.log(' ')
-
                 cashValue -= valueBuy
                 localStorage.cash = cashValue
                 document.querySelector('.cash').textContent = cashValue
-
 
                 resources('access', 'actions').putOnTheMap(elementBuy, quantity)
             }

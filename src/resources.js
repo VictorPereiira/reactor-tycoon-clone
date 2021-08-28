@@ -5,7 +5,7 @@ import build from './constructors/build.js'
 import createElement from './element.js'
 import actions from './actions.js'
 
-export default function resources(func, method) {
+export default function resources(func, method = 'null') {
     const access = (resq) => {
         if (resq === 'initGame') return initGame()
         if (resq === 'draw') return draw()
@@ -33,8 +33,15 @@ export default function resources(func, method) {
         }
     }
 
+    const test = (txt) => {
+        return {
+            on: () => { console.log(txt); }
+        }
+    }
+
     if (func === 'access') return access(method)
     if (func === 'toDOM') return toDOM(method)
+    if (func === 'test') return test(method)
 }
 
 

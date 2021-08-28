@@ -3,13 +3,18 @@ import resources from './resources.js'
 export default function Element() {
 
     return {
+        getBox: (parm) => {
+            if (parm === 'all') return box
+            else return box[parm]
+        },
+
         toOnElement: (id, idMap) => {
             idMap = Math.floor(Number(idMap))
 
             let energyValue = Number(localStorage.energy),
                 energyCapacity = Number(localStorage.energyCapacity),
                 currentMap = JSON.parse(localStorage.mapOn),
-                element = resources('access', 'element').box(0),
+                element = Element().getBox(0),
                 lifeTime = element.lifeTime
 
             if (element.elementStatus === 'on') return console.log('This element is work 🛠')
@@ -33,14 +38,13 @@ export default function Element() {
                 if (lifeTime < 0) {
                     element.elementStatus = 'off'
                     clearInterval(cpt)
-                    createElement().toOnElement(id, idMap)
+                    Element().toOnElement(id, idMap)
                 }
 
             }, 1000) //  element.lifeTime * 1000
         },
 
         callToAllElements: () => {
-            console.log('callToAllElements...')
             let currentMap = JSON.parse(localStorage.mapOn)
 
             for (let i in currentMap.building_site) {
@@ -50,9 +54,8 @@ export default function Element() {
 
                 element.elementStatus = 'off'
                 localStorage.mapOn = JSON.stringify(currentMap)
-                createElement().toOnElement(idEl, i)
+                Element().toOnElement(idEl, i)
             }
-            console.log(' ')
         }
     }
 }
@@ -69,12 +72,8 @@ function createBox(dataElements) {
             'name': dataEl[0],
             'group': dataEl[1],
             'unitValue': dataEl[2],
-            'production': [
-                { 'lv': 0, 'value': dataEl[3] }
-            ],
-            'lifeTime': [
-                { 'lv': 0, 'value': dataEl[4] }
-            ],
+            'production': { 'lv': 0, 'value': dataEl[3] },
+            'lifeTime': { 'lv': 0, 'value': dataEl[4] },
             'update': 'off',
             'elementStatus': 'off',
             'img': dataEl[5]
@@ -86,9 +85,8 @@ function createBox(dataElements) {
 
 let dataElements = [
     ['Wind Turbine', 'Heaters', 1, 1, 5, '<img src="../public/wind-turbine.svg">'],
-    ['Solar Painel', 'Heaters', 200, 10, 30, '<img src="../public/wind-turbine.svg">']
+    ['Solar Painel', 'Heaters', 200, 10, 30, '<img src="../public/CloseIcon.svg">']
     // [nameEl, groupEl, unitValueEL, productionEL, lifeTimeEl, imgEl]
 ]
 
 let box = createBox(dataElements)
-console.log(box);
